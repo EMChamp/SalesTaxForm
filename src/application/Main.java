@@ -19,11 +19,12 @@ public class Main extends Application {
 	  static Scene scene;
 	  static TextField totalPrice;
 	  static TextField totalTax;
-	  
+	  final static int sceneWidth = 1200;
+	  final static int sceneHeight = 475;
 	  //Tax Information
-	  static Double importTax = 0.05;
-	  static Double regularTax = 0.1;
-	  static Double importPlusRegularTax = 0.15;
+	  final static Double importTax = 0.05;
+	  final static Double regularTax = 0.1;
+	  final static Double importPlusRegularTax = 0.15;
 	  
 	  //Quantity and Price Information
 	  static TextField bookQuantity= new TextField("0");
@@ -42,20 +43,30 @@ public class Main extends Application {
       static TextField bottleOfPerfumePrice = new TextField("0");
       static TextField packetOfHeadachePillsPrice = new TextField("0");
         
+      static TextField bookTaxIncl = new TextField("0");
+      static TextField musicCDTaxIncl = new TextField("0");
+      static TextField chocolateBarTaxIncl = new TextField("0");
+      static TextField importedBoxOfChocTaxIncl = new TextField("0");
+      static TextField importedBottleOfPerfumeTaxIncl = new TextField("0");
+      static TextField bottleOfPerfumeTaxIncl = new TextField("0");
+      static TextField packetOfHeadachePillsTaxIncl = new TextField("0");
+      
 	  public void start(Stage primaryStage) {
 		primaryStage.setTitle("Sales Tax Calculator");
 		    
 	    createAndPositionGrid();
 	
-	    scene = new Scene(grid, 1000, 475);
+	    scene = new Scene(grid, sceneWidth, sceneHeight);
 	    primaryStage.setScene(scene);  
 	  
 	    populateQuantityLabels();
 	    populateQuantityTextFields();
 	    populatePriceLabels();
 	    populatePriceTextFields();
+	    populateTaxIncluded();
 	    populateResult();
 	    populateCalculateButton();
+	    populateResetButton();
 	    
 	    primaryStage.setScene(scene);    
 	    primaryStage.show();
@@ -135,7 +146,7 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent t) {
             	
-  
+            	//Calculate total for each item
             	Double totalBook = (Double.parseDouble(bookPrice.getText()) * Double.parseDouble(bookQuantity.getText()));
             	Double totalMusicCD = (Double.parseDouble(musicCDPrice.getText()) * Double.parseDouble(musicCDQuantity.getText()));
             	Double totalChocBar = (Double.parseDouble(chocolateBarPrice.getText()) * Double.parseDouble(chocolateBarQuantity.getText()));
@@ -144,6 +155,7 @@ public class Main extends Application {
             	Double totalBotPerf = (Double.parseDouble(bottleOfPerfumePrice.getText()) * Double.parseDouble(bottleOfPerfumeQuantity.getText()));
             	Double totalPackHeadPills = (Double.parseDouble(packetOfHeadachePillsPrice.getText()) * Double.parseDouble(packetOfHeadachePillsQuantity.getText()));
                 
+            	//Calculate tax for each item
                 Double taxBook = 0.0;
                 Double taxMusicCD = totalMusicCD * regularTax;
                 Double taxChocBar = 0.0;
@@ -152,12 +164,75 @@ public class Main extends Application {
                 Double taxBotPerf  = totalBotPerf * regularTax;
                 Double taxPackHeadPills = 0.0;
                 
+                //Calculate individual item with tax
+                Double totalBookWithTax = (double) Math.round((totalBook + taxBook) * 20) / 20;
+                Double totalMusicCDWithTax = (double) Math.round((totalMusicCD + taxMusicCD) * 20) / 20;
+                Double totalChocBarWithTax = (double) Math.round((totalChocBar + taxChocBar) * 20) / 20;
+                Double totalImpChocBarWithTax = (double) Math.round((totalImpChocBar + taxImpChocBar) * 20) / 20;
+                Double totalImpBotPerfWithTax = (double) Math.round((totalImpBotPerf + taxImpBotPerf) * 20) / 20;
+                Double totalBotPerfWithTax = (double) Math.round((totalBotPerf + taxBotPerf) * 20) / 20;
+                Double totalPackHeadPillsWithTax = (double) Math.round((totalPackHeadPills + taxPackHeadPills) * 20) / 20;
+                
+                //Display individual item tax
+                bookTaxIncl.setText(totalBookWithTax.toString());
+                musicCDTaxIncl.setText(totalMusicCDWithTax.toString());
+                chocolateBarTaxIncl.setText(totalChocBarWithTax.toString());
+                importedBoxOfChocTaxIncl.setText(totalImpChocBarWithTax.toString());
+                importedBottleOfPerfumeTaxIncl.setText(totalImpBotPerfWithTax.toString());
+                bottleOfPerfumeTaxIncl.setText(totalBotPerfWithTax.toString());
+                packetOfHeadachePillsTaxIncl.setText(totalPackHeadPillsWithTax.toString());
+                
+                //Calculate Total Tax
                 Double totalTaxResult = taxBook + taxMusicCD + taxChocBar + taxImpChocBar + taxImpBotPerf + taxBotPerf + taxPackHeadPills;
                 totalTaxResult = (double) Math.round(totalTaxResult * 20) / 20; // Round to nearest 0.05
                 totalTax.setText(totalTaxResult.toString());
                 
+                //Calculate Total Price with tax
                 Double totalPriceResult = totalTaxResult + totalBook + totalMusicCD + totalChocBar + totalImpChocBar + totalImpBotPerf + totalBotPerf + totalPackHeadPills;
+                totalPriceResult = (double) Math.round(totalPriceResult * 100) / 100; // Round to nearest 0.05
                 totalPrice.setText(totalPriceResult.toString());
+            }
+        });
+		
+	}
+	
+	public static void populateResetButton() {
+		Button resetButton = new Button("Reset");        
+		HBox hbox = new HBox(10);
+		hbox.setAlignment(Pos.BOTTOM_RIGHT);
+		hbox.getChildren().add(resetButton);
+		grid.add(hbox, 1, 11);
+		
+		resetButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+
+            bookQuantity.setText("0");
+          	musicCDQuantity.setText("0");
+          	chocolateBarQuantity.setText("0");
+          	importedBoxOfChocQuantity.setText("0");
+          	importedBottleOfPerfumeQuantity.setText("0");
+          	bottleOfPerfumeQuantity.setText("0");
+          	packetOfHeadachePillsQuantity.setText("0");
+          	  
+          	bookPrice.setText("0");
+            musicCDPrice.setText("0");
+            chocolateBarPrice.setText("0");
+            importedBoxOfChocPrice.setText("0");
+            importedBottleOfPerfumePrice.setText("0");
+            bottleOfPerfumePrice.setText("0");
+            packetOfHeadachePillsPrice.setText("0");
+            
+            bookTaxIncl.setText("0");
+            musicCDTaxIncl.setText("0");
+            chocolateBarTaxIncl.setText("0");
+            importedBoxOfChocTaxIncl.setText("0");
+            importedBottleOfPerfumeTaxIncl.setText("0");
+            bottleOfPerfumeTaxIncl.setText("0");
+            packetOfHeadachePillsTaxIncl.setText("0");
+            
+            totalPrice.setText("0");
+            totalTax.setText("0");
             }
         });
 		
@@ -176,6 +251,31 @@ public class Main extends Application {
 		grid.add(totalTax, 1, 9);
 	}
 	
+	public static void populateTaxIncluded() {
+		Label bookPrice = new Label("Price of Books with tax");
+        Label musicCDPrice = new Label("Price of Music CDs with tax");
+        Label chocolateBarPrice = new Label("Price of Chocolate Bars with tax");
+        Label importedBoxOfChocPrice = new Label("Price of Imported Chocolate Barswith tax");
+        Label importedBottleOfPerfumePrice = new Label("Price of Imported Bottles of Perfume with tax");
+        Label bottleOfPerfumePrice = new Label("Price of Bottle of Perfume with tax");
+        Label packetOfHeadachePillsPrice = new Label("Price of Packet of Headache Pills with tax");
+
+        grid.add(bookPrice,5,1);
+        grid.add(musicCDPrice,5,2);
+        grid.add(chocolateBarPrice,5,3);
+        grid.add(importedBoxOfChocPrice,5,4);
+        grid.add(importedBottleOfPerfumePrice,5,5);
+        grid.add(bottleOfPerfumePrice,5,6);
+        grid.add(packetOfHeadachePillsPrice,5,7);	
+        
+        grid.add(bookTaxIncl,6,1);
+        grid.add(musicCDTaxIncl,6,2);
+        grid.add(chocolateBarTaxIncl,6,3);
+        grid.add(importedBoxOfChocTaxIncl,6,4);
+        grid.add(importedBottleOfPerfumeTaxIncl,6,5);
+        grid.add(bottleOfPerfumeTaxIncl,6,6);
+        grid.add(packetOfHeadachePillsTaxIncl,6,7);
+	}
 	public static void main(String[] args) {
 		launch(args);
 	}
